@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Portfolio — Bold</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --surface: #141414;
+      --border: #2a2a2a;
+      --text: #f0ede6;
+      --muted: #666;
+      --lime: #c8f060;
+      --lime-dim: #9ab840;
+      --red: #ff3d2e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CUSTOM CURSOR ── */
+    #cursor {
+      position: fixed; z-index: 9999; pointer-events: none;
+      width: 12px; height: 12px; background: var(--lime);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s ease, width 0.25s, height 0.25s, background 0.25s;
+    }
+    #cursor-ring {
+      position: fixed; z-index: 9998; pointer-events: none;
+      width: 36px; height: 36px;
+      border: 1px solid rgba(200,240,96,0.4);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s ease, width 0.3s, height 0.3s, opacity 0.3s;
+    }
+    body:hover #cursor { opacity: 1; }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.5rem 4vw;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13,13,13,0.9);
+      backdrop-filter: blur(12px);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem; letter-spacing: 0.08em;
+      text-decoration: none; color: var(--text);
+    }
+    .nav-logo span { color: var(--lime); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: 'Syne Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; color: var(--muted);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--lime); }
+
+    /* ── SECTIONS ── */
+    section { padding: 8rem 4vw; position: relative; }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding-bottom: 6rem;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .hero-bg-number {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(220px, 35vw, 480px);
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,0.04);
+      letter-spacing: -0.04em;
+      user-select: none; pointer-events: none;
+      line-height: 1;
+    }
+    .hero-label {
+      font-family: 'Syne Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--lime); margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeIn 0.5s 0.2s ease forwards;
+    }
+    .hero-label::before { content: '//  '; }
+    h1.hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 13vw, 13rem);
+      line-height: 0.88; letter-spacing: -0.01em;
+      text-transform: uppercase;
+      opacity: 0; animation: slideUp 0.7s 0.3s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    h1.hero-title .outline {
+      -webkit-text-stroke: 2px var(--text);
+      color: transparent;
+    }
+    h1.hero-title .accent { color: var(--lime); }
+    .hero-bottom {
+      margin-top: 3rem;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      flex-wrap: wrap; gap: 2rem;
+      opacity: 0; animation: fadeIn 0.6s 0.7s ease forwards;
+    }
+    .hero-sub {
+      max-width: 34ch; font-size: 1rem; color: var(--muted);
+      font-weight: 400; line-height: 1.65;
+    }
+    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.85rem 2rem;
+      font-family: 'Syne', sans-serif; font-size: 0.8rem;
+      font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; border: 1px solid var(--border);
+      color: var(--text); background: transparent;
+      transition: all 0.2s; position: relative; overflow: hidden;
+    }
+    .btn::after {
+      content: ''; position: absolute; inset: 0;
+      background: var(--lime); transform: scaleX(0); transform-origin: left;
+      transition: transform 0.25s cubic-bezier(0.16,1,0.3,1); z-index: -1;
+    }
+    .btn:hover { color: #000; border-color: var(--lime); }
+    .btn:hover::after { transform: scaleX(1); }
+    .btn-filled { background: var(--lime); color: #000; border-color: var(--lime); }
+    .btn-filled::after { background: #fff; }
+    .btn-filled:hover { color: #000; }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      overflow: hidden; border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0; background: var(--surface);
+    }
+    .marquee-track {
+      display: flex; gap: 3rem; width: max-content;
+      animation: marquee 22s linear infinite;
+    }
+    .marquee-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); white-space: nowrap;
+      display: flex; align-items: center; gap: 3rem;
+    }
+    .marquee-item .dot { color: var(--lime); font-size: 0.5rem; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 4rem; flex-wrap: wrap; gap: 1.5rem;
+    }
+    .section-num {
+      font-family: 'Syne Mono', monospace;
+      font-size: 0.7rem; color: var(--lime); letter-spacing: 0.1em;
+      margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      letter-spacing: 0.02em; line-height: 1;
+      text-transform: uppercase;
+    }
+
+    /* ── ABOUT ── */
+    #about { border-bottom: 1px solid var(--border); }
+    .about-inner {
+      display: grid; grid-template-columns: 1fr 1.4fr; gap: 6rem; align-items: start;
+    }
+    .about-photo {
+      position: relative;
+      aspect-ratio: 3/4;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .about-photo::after {
+      content: '';
+      position: absolute; top: 12px; left: 12px; right: -12px; bottom: -12px;
+      border: 1px solid var(--lime); z-index: -1;
+    }
+    .about-body { padding-top: 1rem; }
+    .about-body h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      line-height: 1; letter-spacing: 0.02em; margin-bottom: 1.5rem;
+    }
+    .about-body h2 span { color: var(--lime); }
+    .about-body p { color: var(--muted); line-height: 1.75; margin-bottom: 1rem; font-size: 0.95rem; }
+    .skills-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0; margin-top: 2rem;
+      border: 1px solid var(--border);
+    }
+    .skill-item {
+      padding: 0.75rem 1rem;
+      font-family: 'Syne Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.06em;
+      color: var(--muted); border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      transition: color 0.2s, background 0.2s;
+    }
+    .skill-item:hover { color: var(--lime); background: rgba(200,240,96,0.04); }
+
+    /* ── PROJECTS ── */
+    #coding, #creative { border-bottom: 1px solid var(--border); }
+    .project-list { display: flex; flex-direction: column; gap: 0; }
+    .project-row {
+      display: grid; grid-template-columns: 3rem 1fr auto;
+      align-items: start; gap: 2rem;
+      padding: 2.5rem 0; border-bottom: 1px solid var(--border);
+      text-decoration: none; color: var(--text);
+      transition: background 0.2s;
+      position: relative;
+    }
+    .project-row::before {
+      content: ''; position: absolute; left: -4vw; right: -4vw; top: 0; bottom: 0;
+      background: var(--surface); opacity: 0; transition: opacity 0.2s; z-index: -1;
+    }
+    .project-row:hover::before { opacity: 1; }
+    .project-row:hover .project-arrow { transform: translate(4px, -4px); color: var(--lime); }
+    .project-num {
+      font-family: 'Syne Mono', monospace;
+      font-size: 0.7rem; color: var(--muted); padding-top: 0.35rem;
+    }
+    .project-body h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      letter-spacing: 0.04em; line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+    .project-body p { font-size: 0.88rem; color: var(--muted); max-width: 52ch; line-height: 1.65; }
+    .project-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+    .p-tag {
+      font-family: 'Syne Mono', monospace; font-size: 0.68rem;
+      padding: 0.25rem 0.6rem; border: 1px solid var(--border);
+      color: var(--muted); letter-spacing: 0.06em;
+    }
+    .project-arrow {
+      font-size: 1.5rem; color: var(--border);
+      transition: transform 0.25s, color 0.25s;
+      padding-top: 0.25rem;
+    }
+
+    /* ── CREATIVE GRID ── */
+    .creative-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+    .creative-card {
+      background: var(--bg); padding: 2.5rem 2rem;
+      transition: background 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .creative-card:hover { background: var(--surface); }
+    .creative-card:hover .cc-num { color: var(--lime); }
+    .cc-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem; color: var(--border);
+      line-height: 1; margin-bottom: 1rem;
+      transition: color 0.3s;
+    }
+    .cc-type {
+      font-family: 'Syne Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--lime); margin-bottom: 0.5rem;
+    }
+    .creative-card h3 {
+      font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .creative-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+    .cc-link {
+      display: inline-block; margin-top: 1.5rem;
+      font-family: 'Syne Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; color: var(--muted); transition: color 0.2s;
+    }
+    .cc-link:hover { color: var(--lime); }
+
+    /* ── BLOG ── */
+    #blog { border-bottom: 1px solid var(--border); }
+    .blog-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .blog-card {
+      border: 1px solid var(--border); padding: 2rem;
+      text-decoration: none; color: var(--text);
+      display: flex; flex-direction: column;
+      transition: border-color 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .blog-card::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      height: 2px; width: 0; background: var(--lime);
+      transition: width 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .blog-card:hover { border-color: rgba(200,240,96,0.3); }
+    .blog-card:hover::after { width: 100%; }
+    .blog-card-meta {
+      font-family: 'Syne Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1rem;
+    }
+    .blog-card h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; line-height: 1.4; margin-bottom: 0.75rem; }
+    .blog-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; flex: 1; }
+    .blog-read {
+      margin-top: 1.5rem; font-family: 'Syne Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--lime);
+    }
+
+    /* ── CONTACT ── */
+    #contact { border-bottom: 1px solid var(--border); }
+    .contact-inner {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start;
+    }
+    .contact-left h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 7vw, 6rem); line-height: 0.9;
+      letter-spacing: 0.02em; margin-bottom: 2rem;
+    }
+    .contact-left h2 span { display: block; color: var(--lime); }
+    .contact-left p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 2rem; }
+    .contact-socials { display: flex; flex-direction: column; gap: 0; }
+    .soc-link {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 0; border-bottom: 1px solid var(--border);
+      text-decoration: none; color: var(--muted); font-size: 0.88rem;
+      font-weight: 500; transition: color 0.2s;
+    }
+    .soc-link:first-child { border-top: 1px solid var(--border); }
+    .soc-link:hover { color: var(--lime); }
+    .soc-arr { transition: transform 0.2s; }
+    .soc-link:hover .soc-arr { transform: translate(4px, -4px); }
+    .contact-form { display: flex; flex-direction: column; gap: 0; }
+    .contact-form input, .contact-form textarea {
+      width: 100%; padding: 1rem 1.25rem;
+      border: 1px solid var(--border); border-top: none;
+      background: var(--surface); color: var(--text);
+      font-family: 'Syne', sans-serif; font-size: 0.9rem;
+      outline: none; resize: none;
+      transition: border-color 0.2s;
+    }
+    .contact-form input:first-child { border-top: 1px solid var(--border); }
+    .contact-form input:focus, .contact-form textarea:focus { border-color: var(--lime); }
+    .contact-form textarea { min-height: 140px; }
+    .contact-form .btn { width: 100%; justify-content: center; margin-top: 1.5rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 4vw;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
+    footer p {
+      font-family: 'Syne Mono', monospace;
+      font-size: 0.7rem; color: var(--muted); letter-spacing: 0.06em;
+    }
+    footer .f-dot { color: var(--lime); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 720px) {
+      .about-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .nav-links { display: none; }
+      .project-row { grid-template-columns: 2rem 1fr; }
+      .project-arrow { display: none; }
+      .skills-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#hero">YOUR<span>.</span>NAME</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#coding">Code</a></li>
+      <li><a href="#creative">Creative</a></li>
+      <li><a href="#blog">Writing</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg-number">01</div>
+    <p class="hero-label">Portfolio — 2025</p>
+    <h1 class="hero-title">
+      YOUR<br>
+      <span class="outline">NAME</span><br>
+      <span class="accent">HERE.</span>
+    </h1>
+    <div class="hero-bottom">
+      <p class="hero-sub">Developer, maker, and creative thinker building things at the intersection of code and imagination.</p>
+      <div class="hero-cta">
+        <a href="#coding" class="btn btn-filled">View Work ↓</a>
+        <a href="#contact" class="btn">Get in Touch →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track" aria-hidden="true">
+      <span class="marquee-item">Coding Projects <span class="dot">●</span> Creative Work <span class="dot">●</span> Writing <span class="dot">●</span> Open Source <span class="dot">●</span> Design <span class="dot">●</span> Experiments <span class="dot">●</span></span>
+      <span class="marquee-item">Coding Projects <span class="dot">●</span> Creative Work <span class="dot">●</span> Writing <span class="dot">●</span> Open Source <span class="dot">●</span> Design <span class="dot">●</span> Experiments <span class="dot">●</span></span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-num">// 01</p>
+        <h2 class="section-title">About</h2>
+      </div>
+    </div>
+    <div class="about-inner">
+      <div class="about-photo reveal">Your photo here</div>
+      <div class="about-body reveal">
+        <h2>Hi, I'm <span>Your Name.</span></h2>
+        <p>A short paragraph about who you are, where you're based, and what drives your work. Keep it human — people want to know the person behind the projects.</p>
+        <p>A second line about your background, interests, or what you're currently exploring and learning.</p>
+        <div class="skills-grid">
+          <div class="skill-item">JavaScript</div>
+          <div class="skill-item">Python</div>
+          <div class="skill-item">React</div>
+          <div class="skill-item">Your skill</div>
+          <div class="skill-item">Your skill</div>
+          <div class="skill-item">Your skill</div>
+        </div>
+        <div style="margin-top: 2rem;">
+          <a href="#contact" class="btn">Let's work together →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CODING PROJECTS -->
+  <section id="coding">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-num">// 02</p>
+        <h2 class="section-title">Code</h2>
+      </div>
+      <a href="https://github.com/yourusername" class="btn" style="align-self:flex-end" target="_blank">GitHub ↗</a>
+    </div>
+    <div class="project-list">
+
+      <div class="project-row reveal">
+        <span class="project-num">01</span>
+        <div class="project-body">
+          <h3>Project Title</h3>
+          <p>A short description of what this project does and why you built it. What problem does it solve?</p>
+          <div class="project-tags">
+            <span class="p-tag">React</span>
+            <span class="p-tag">Node</span>
+            <span class="p-tag">Web App</span>
+          </div>
+        </div>
+        <span class="project-arrow">↗</span>
+      </div>
+
+      <div class="project-row reveal">
+        <span class="project-num">02</span>
+        <div class="project-body">
+          <h3>Project Title</h3>
+          <p>A short description of what this project does and why you built it. What problem does it solve?</p>
+          <div class="project-tags">
+            <span class="p-tag">Python</span>
+            <span class="p-tag">API</span>
+            <span class="p-tag">Tool</span>
+          </div>
+        </div>
+        <span class="project-arrow">↗</span>
+      </div>
+
+      <div class="project-row reveal">
+        <span class="project-num">03</span>
+        <div class="project-body">
+          <h3>Project Title</h3>
+          <p>A short description of what this project does and why you built it. What problem does it solve?</p>
+          <div class="project-tags">
+            <span class="p-tag">JavaScript</span>
+            <span class="p-tag">Experiment</span>
+          </div>
+        </div>
+        <span class="project-arrow">↗</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CREATIVE PROJECTS -->
+  <section id="creative">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-num">// 03</p>
+        <h2 class="section-title">Creative</h2>
+      </div>
+    </div>
+    <div class="creative-grid reveal">
+
+      <div class="creative-card">
+        <div class="cc-num">01</div>
+        <p class="cc-type">Design</p>
+        <h3>Project Title</h3>
+        <p>Describe your creative project — the medium, what inspired it, what you made.</p>
+        <a href="#" class="cc-link">View project →</a>
+      </div>
+
+      <div class="creative-card">
+        <div class="cc-num">02</div>
+        <p class="cc-type">Photography</p>
+        <h3>Project Title</h3>
+        <p>Describe your creative project — the medium, what inspired it, what you made.</p>
+        <a href="#" class="cc-link">View project →</a>
+      </div>
+
+      <div class="creative-card">
+        <div class="cc-num">03</div>
+        <p class="cc-type">Making</p>
+        <h3>Project Title</h3>
+        <p>Describe your creative project — the medium, what inspired it, what you made.</p>
+        <a href="#" class="cc-link">View project →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BLOG -->
+  <section id="blog">
+    <div class="section-header reveal">
+      <div>
+        <p class="section-num">// 04</p>
+        <h2 class="section-title">Writing</h2>
+      </div>
+    </div>
+    <div class="blog-grid reveal">
+
+      <a href="#" class="blog-card">
+        <p class="blog-card-meta">May 2025  ·  4 min read</p>
+        <h3>Your first blog post title goes here</h3>
+        <p>A short teaser or the opening line of the post — give people a reason to click through.</p>
+        <p class="blog-read">Read more →</p>
+      </a>
+
+      <a href="#" class="blog-card">
+        <p class="blog-card-meta">April 2025  ·  6 min read</p>
+        <h3>What I learned building X from scratch</h3>
+        <p>A short teaser or the opening line of the post — give people a reason to click through.</p>
+        <p class="blog-read">Read more →</p>
+      </a>
+
+      <a href="#" class="blog-card">
+        <p class="blog-card-meta">March 2025  ·  3 min read</p>
+        <h3>A reflection on something you've been thinking about</h3>
+        <p>A short teaser or the opening line of the post — give people a reason to click through.</p>
+        <p class="blog-read">Read more →</p>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="contact-inner">
+      <div class="contact-left reveal">
+        <p class="section-num">// 05</p>
+        <h2><span>Let's</span>Talk.</h2>
+        <p>Whether it's a project idea, a collaboration, or just saying hello — my inbox is open.</p>
+        <div class="contact-socials">
+          <a href="mailto:you@email.com" class="soc-link">
+            <span>✉ you@email.com</span>
+            <span class="soc-arr">↗</span>
+          </a>
+          <a href="https://github.com/yourusername" class="soc-link" target="_blank">
+            <span>⌥ GitHub</span>
+            <span class="soc-arr">↗</span>
+          </a>
+          <a href="https://linkedin.com/in/yourprofile" class="soc-link" target="_blank">
+            <span>↳ LinkedIn</span>
+            <span class="soc-arr">↗</span>
+          </a>
+        </div>
+      </div>
+      <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+        <input type="text" placeholder="Your name" required/>
+        <input type="email" placeholder="Your email" required/>
+        <textarea placeholder="Tell me about your project or idea..." required></textarea>
+        <button type="submit" class="btn btn-filled" style="cursor:none; font-family:inherit;">Send Message →</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Your Name <span class="f-dot">●</span> All rights reserved</p>
+    <p>Built with HTML <span class="f-dot">//</span> GitHub Pages</p>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animCursor() {
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
+    document.querySelectorAll('a, button, .project-row, .creative-card, .blog-card').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.width = '20px'; cursor.style.height = '20px'; cursor.style.background = 'var(--lime)'; ring.style.width = '56px'; ring.style.height = '56px'; });
+      el.addEventListener('mouseleave', () => { cursor.style.width = '12px'; cursor.style.height = '12px'; ring.style.width = '36px'; ring.style.height = '36px'; });
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    reveals.forEach(el => obs.observe(el));
+
+    // Contact form
+    function handleSubmit(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      btn.textContent = 'Sent ✓'; btn.disabled = true;
+      e.target.reset();
+      setTimeout(() => { btn.textContent = 'Send Message →'; btn.disabled = false; }, 3000);
+    }
+  </script>
+
+</body>
+</html>
